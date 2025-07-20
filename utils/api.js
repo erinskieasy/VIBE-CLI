@@ -10,8 +10,8 @@ module.exports.getComponent = async (name, config) => {
   console.log(chalk.gray(`Requesting component: ${name}`));
   
   return new Promise((resolve, reject) => {
-    // Base44 API endpoint structure
-    const url = `${config.platform}/api/v1/entities/Component?name=${name}`;
+    // Base44 API endpoint structure - try different possible endpoints
+    const url = `${config.platform}/api/v1/entities/Component`;
     const options = {
       headers: {
         'X-Access-Key': config.accessKey,
@@ -32,17 +32,23 @@ module.exports.getComponent = async (name, config) => {
         try {
           if (res.statusCode === 200) {
             const response = JSON.parse(data);
-            // Base44 returns arrays, so we need to find the component by name
+            console.log(chalk.gray(`API Response:`, JSON.stringify(response, null, 2)));
+            
+            // Base44 returns arrays, filter by name on client side
             const components = Array.isArray(response) ? response : [response];
-            const component = components.find(c => c.name === name);
+            const component = components.find(c => 
+              c.name === name || 
+              c.component_name === name || 
+              c.title === name
+            );
             
             if (component) {
               // Transform Base44 component format to CLI expected format
               resolve({
-                name: component.name,
-                code: component.tsx_code,
+                name: component.name || component.component_name || component.title,
+                code: component.tsx_code || component.code || component.content,
                 version: component.version || '1.0.0',
-                description: component.description
+                description: component.description || component.desc
               });
             } else {
               resolve(null); // Component not found
@@ -129,7 +135,7 @@ module.exports.listComponents = async (config) => {
  */
 module.exports.verifyProject = async (config) => {
   return new Promise((resolve, reject) => {
-    const url = `${config.platform}/api/v1/entities/Project?project_id=${config.projectId}`;
+    const url = `${config.platform}/api/v1/entities/Project`;
     const options = {
       headers: {
         'X-Access-Key': config.accessKey,
