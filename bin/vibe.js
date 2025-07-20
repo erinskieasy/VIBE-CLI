@@ -57,7 +57,7 @@ program
       console.log(chalk.blue(`🔄 Pulling ${components.length} components...`));
       
       for (const component of components) {
-        await pull(component.name);
+        await pull(component.id);
       }
       
       console.log(chalk.green(`✅ Successfully downloaded ${components.length} components!`));
