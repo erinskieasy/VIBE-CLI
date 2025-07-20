@@ -39,8 +39,20 @@ program
   .description("Download all available components from the platform")
   .action(async () => {
     try {
+      const fs = require('fs');
+      const path = require('path');
+      
+      // Read configuration
+      const configPath = path.join(process.cwd(), '.vibecode.json');
+      if (!fs.existsSync(configPath)) {
+        throw new Error('No .vibecode.json found. Run "vibe init" first.');
+      }
+      
+      const configContent = fs.readFileSync(configPath, 'utf8');
+      const config = JSON.parse(configContent);
+      
       const { listComponents } = require("../utils/api");
-      const components = await listComponents();
+      const components = await listComponents(config);
       
       console.log(chalk.blue(`🔄 Pulling ${components.length} components...`));
       

@@ -1,83 +1,100 @@
+
 const chalk = require('chalk');
+const https = require('https');
+const http = require('http');
 
 /**
- * Mock API function to simulate fetching component data from the platform
- * In a real implementation, this would make HTTP requests to the actual API
+ * Real API function to fetch component data from the platform
  */
-module.exports.getComponent = async (name) => {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
+module.exports.getComponent = async (name, config) => {
   console.log(chalk.gray(`Requesting component: ${name}`));
   
-  const mockData = {
-    Button: {
-      name: 'Button',
-      version: '1.0.0',
-      code: `export const Button = () => <button className="bg-blue-500 text-white py-2 px-4 rounded">Click Me</button>;`
-    },
-    Card: {
-      name: 'Card',
-      version: '1.0.0',
-      code: `export const Card = ({ title, children }) => (
-  <div className="border rounded p-4 shadow">
-    <h3 className="font-bold text-lg">{title}</h3>
-    <div>{children}</div>
-  </div>
-);`
-    },
-    Modal: {
-      name: 'Modal',
-      version: '1.0.0',
-      code: `export const Modal = ({ isOpen, onClose, children }) => {
-  if (!isOpen) return null;
-  
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <button 
-          onClick={onClose}
-          className="float-right text-gray-500 hover:text-gray-700"
-        >
-          ×
-        </button>
-        {children}
-      </div>
-    </div>
-  );
-};`
-    },
-    Input: {
-      name: 'Input',
-      version: '1.0.0',
-      code: `export const Input = ({ label, type = "text", placeholder, ...props }) => (
-  <div className="mb-4">
-    {label && <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>}
-    <input
-      type={type}
-      placeholder={placeholder}
-      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-      {...props}
-    />
-  </div>
-);`
-    }
-  };
+  return new Promise((resolve, reject) => {
+    const url = `${config.platformUrl}/api/components/${name}`;
+    const options = {
+      headers: {
+        'Authorization': `Bearer ${config.token}`,
+        'Content-Type': 'application/json',
+        'User-Agent': 'vibe-cli/0.1.0'
+      }
+    };
 
-  return mockData[name] || null;
+    const request = (url.startsWith('https') ? https : http).get(url, options, (res) => {
+      let data = '';
+      
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+      
+      res.on('end', () => {
+        try {
+          if (res.statusCode === 200) {
+            const component = JSON.parse(data);
+            resolve(component);
+          } else if (res.statusCode === 404) {
+            resolve(null); // Component not found
+          } else {
+            reject(new Error(`HTTP ${res.statusCode}: ${data}`));
+          }
+        } catch (error) {
+          reject(new Error(`Failed to parse response: ${error.message}`));
+        }
+      });
+    });
+
+    request.on('error', (error) => {
+      reject(new Error(`Network request failed: ${error.message}`));
+    });
+
+    request.setTimeout(10000, () => {
+      request.destroy();
+      reject(new Error('Request timeout'));
+    });
+  });
 };
 
 /**
- * Mock function to list available components
- * This would be used for future features like "vibe list"
+ * Real function to list available components
  */
-module.exports.listComponents = async () => {
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  return [
-    { name: 'Button', description: 'Interactive button component' },
-    { name: 'Card', description: 'Content container with shadow' },
-    { name: 'Modal', description: 'Overlay dialog component' },
-    { name: 'Input', description: 'Form input field with label' }
-  ];
+module.exports.listComponents = async (config) => {
+  return new Promise((resolve, reject) => {
+    const url = `${config.platformUrl}/api/components`;
+    const options = {
+      headers: {
+        'Authorization': `Bearer ${config.token}`,
+        'Content-Type': 'application/json',
+        'User-Agent': 'vibe-cli/0.1.0'
+      }
+    };
+
+    const request = (url.startsWith('https') ? https : http).get(url, options, (res) => {
+      let data = '';
+      
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+      
+      res.on('end', () => {
+        try {
+          if (res.statusCode === 200) {
+            const components = JSON.parse(data);
+            resolve(components);
+          } else {
+            reject(new Error(`HTTP ${res.statusCode}: ${data}`));
+          }
+        } catch (error) {
+          reject(new Error(`Failed to parse response: ${error.message}`));
+        }
+      });
+    });
+
+    request.on('error', (error) => {
+      reject(new Error(`Network request failed: ${error.message}`));
+    });
+
+    request.setTimeout(10000, () => {
+      request.destroy();
+      reject(new Error('Request timeout'));
+    });
+  });
 };
