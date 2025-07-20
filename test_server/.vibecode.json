@@ -1,6 +1,6 @@
 {
-  "platform": "https://app--component-hub-01919f93.base44.app",
-  "projectId": "687d0e8b3e0abad4bb126cb4",
-  "accessKey": "vibe_key_EqakZClOGwimmA382s25qayxAJ5XfxC8",
+  "platform": "http://localhost:3001",
+  "projectId": "mytestproject-4",
+  "accessKey": "ch_fZPlTB1fMOioxTu6f1xytpYOYBye8028",
   "output": "react-tailwind"
 }
