@@ -92,9 +92,20 @@ program
       const configPath = path.join(process.cwd(), '.vibecode.json');
       fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
       
-      console.log(chalk.green('✅ Connected successfully!'));
-      console.log(chalk.gray('Configuration saved to .vibecode.json'));
-      console.log(chalk.gray('You can now use "vibe pull <component-name>" to download components.'));
+      // Verify the connection
+      console.log(chalk.gray('Verifying connection...'));
+      const { verifyProject } = require("../utils/api");
+      
+      try {
+        await verifyProject(config);
+        console.log(chalk.green('✅ Connected successfully!'));
+        console.log(chalk.gray('Configuration saved to .vibecode.json'));
+        console.log(chalk.gray('You can now use "vibe pull <component-name>" to download components.'));
+      } catch (verifyError) {
+        console.log(chalk.yellow('⚠️  Configuration saved but connection verification failed:'));
+        console.log(chalk.red(`   ${verifyError.message}`));
+        console.log(chalk.gray('You can still try using "vibe pull <component-name>" to test the connection.'));
+      }
     } catch (error) {
       console.error(chalk.red("Error connecting:"), error.message);
       process.exit(1);
