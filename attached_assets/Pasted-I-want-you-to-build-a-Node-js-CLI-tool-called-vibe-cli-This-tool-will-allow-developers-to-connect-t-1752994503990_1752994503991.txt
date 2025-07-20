@@ -1,0 +1,145 @@
+I want you to build a Node.js CLI tool called vibe-cli. This tool will allow developers to connect their local frontend projects to my Component Hub platform and download prebuilt component code snippets into their project.
+
+This is a proof-of-concept/demo build, so hardcode mock API responses for now — do not integrate live APIs yet. Make the file and folder structure realistic so I can wire it up later to my actual platform.
+
+🎯 What to Build
+Name: vibe-cli
+Type: Node.js CLI (published via npm)
+Key Commands:
+
+vibe init → creates .vibecode.json
+
+vibe pull <component-name> → downloads a component from platform and saves it locally
+
+🧱 Requirements & Structure
+✅ Project Folder Layout:
+kotlin
+Copy
+Edit
+vibe-cli/
+├── bin/
+│   └── vibe.js                ← main CLI entry point
+├── lib/
+│   ├── init.js                ← handles vibe init
+│   ├── pull.js                ← handles vibe pull <component-name>
+├── utils/
+│   └── api.js                 ← mock API responses for now
+├── package.json
+└── README.md
+📦 Dependencies
+Install:
+
+commander (for CLI)
+
+inquirer (for terminal prompts)
+
+fs and path (Node core modules)
+
+chalk (optional: styled terminal output)
+
+Use CommonJS (require) syntax, not ESM (import).
+
+⚙️ CLI Commands and Behaviors
+1. vibe init
+Creates a .vibecode.json file in the current directory with the following structure:
+
+json
+Copy
+Edit
+{
+  "platformUrl": "https://mock.vibeplatform.dev",
+  "projectId": "demo-project",
+  "token": "vibe_sk_1234",
+  "outputFormat": "react-tailwind"
+}
+Prompt the user for these values using inquirer.
+
+2. vibe pull <component-name>
+Reads .vibecode.json from the current directory.
+
+Fetches component data using a mocked getComponent(name) function from utils/api.js.
+
+Saves the component code to src/components/<ComponentName>.tsx.
+
+Prepends a comment with metadata, like:
+
+tsx
+Copy
+Edit
+// vibe-source: https://mock.vibeplatform.dev/components/Button
+// version: 1.0.0
+
+export const Button = () => <button className="...">Click</button>
+If the folder src/components/ doesn't exist, create it.
+
+🧠 Mock API in utils/api.js
+Create a getComponent(name) function that returns mocked data like this:
+
+js
+Copy
+Edit
+module.exports.getComponent = async (name) => {
+  const mockData = {
+    Button: {
+      name: 'Button',
+      version: '1.0.0',
+      code: `export const Button = () => <button className="bg-blue-500 text-white py-2 px-4 rounded">Click Me</button>;`
+    },
+    Card: {
+      name: 'Card',
+      version: '1.0.0',
+      code: `export const Card = ({ title, children }) => (
+  <div className="border rounded p-4 shadow">
+    <h3 className="font-bold text-lg">{title}</h3>
+    <div>{children}</div>
+  </div>
+);`
+    }
+  };
+
+  return mockData[name] || null;
+};
+📝 package.json bin field
+Make sure the CLI works when installed globally. In package.json, include:
+
+json
+Copy
+Edit
+"bin": {
+  "vibe": "./bin/vibe.js"
+}
+Also include:
+
+"name": "vibe-cli"
+
+"version": "0.1.0"
+
+"type": "commonjs"
+
+🧪 Example Usage
+Inside a test React project:
+
+bash
+Copy
+Edit
+npm install -g ../vibe-cli  # install from local folder
+vibe init                   # creates .vibecode.json
+vibe pull Button            # pulls Button and saves to src/components/Button.tsx
+After pull, the file should exist and look like this:
+
+tsx
+Copy
+Edit
+// vibe-source: https://mock.vibeplatform.dev/components/Button
+// version: 1.0.0
+
+export const Button = () => <button className="bg-blue-500 text-white py-2 px-4 rounded">Click Me</button>;
+✅ Done Criteria
+CLI works with vibe init and vibe pull
+
+.vibecode.json is created interactively
+
+Component code is saved to src/components/
+
+Project is ready to be published to npm
+
