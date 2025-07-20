@@ -10,10 +10,10 @@ module.exports.getComponent = async (name, config) => {
   console.log(chalk.gray(`Requesting component: ${name}`));
   
   return new Promise((resolve, reject) => {
-    const url = `${config.platformUrl}/api/components/${name}`;
+    const url = `${config.platform}/api/components/${name}`;
     const options = {
       headers: {
-        'Authorization': `Bearer ${config.token}`,
+        'Authorization': `Bearer ${config.accessKey}`,
         'Content-Type': 'application/json',
         'User-Agent': 'vibe-cli/0.1.0'
       }
@@ -58,10 +58,10 @@ module.exports.getComponent = async (name, config) => {
  */
 module.exports.listComponents = async (config) => {
   return new Promise((resolve, reject) => {
-    const url = `${config.platformUrl}/api/components`;
+    const url = `${config.platform}/api/components`;
     const options = {
       headers: {
-        'Authorization': `Bearer ${config.token}`,
+        'Authorization': `Bearer ${config.accessKey}`,
         'Content-Type': 'application/json',
         'User-Agent': 'vibe-cli/0.1.0'
       }

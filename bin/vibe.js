@@ -67,4 +67,38 @@ program
     }
   });
 
+program
+  .command("connect")
+  .description("Quick connect using access key")
+  .option("--key <accessKey>", "Access key for authentication")
+  .action(async (options) => {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      
+      if (!options.key) {
+        console.error(chalk.red("Error: --key option is required"));
+        process.exit(1);
+      }
+      
+      // Create configuration with provided key and defaults
+      const config = {
+        platform: "https://componenthub.io",
+        projectId: "mytestproject-6k8p05",
+        accessKey: options.key,
+        output: "react-tailwind"
+      };
+      
+      const configPath = path.join(process.cwd(), '.vibecode.json');
+      fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+      
+      console.log(chalk.green('✅ Connected successfully!'));
+      console.log(chalk.gray('Configuration saved to .vibecode.json'));
+      console.log(chalk.gray('You can now use "vibe pull <component-name>" to download components.'));
+    } catch (error) {
+      console.error(chalk.red("Error connecting:"), error.message);
+      process.exit(1);
+    }
+  });
+
 program.parse();
