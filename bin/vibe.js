@@ -34,4 +34,25 @@ program
     }
   });
 
+program
+  .command("pull-all")
+  .description("Download all available components from the platform")
+  .action(async () => {
+    try {
+      const { listComponents } = require("../utils/api");
+      const components = await listComponents();
+      
+      console.log(chalk.blue(`🔄 Pulling ${components.length} components...`));
+      
+      for (const component of components) {
+        await pull(component.name);
+      }
+      
+      console.log(chalk.green(`✅ Successfully downloaded ${components.length} components!`));
+    } catch (error) {
+      console.error(chalk.red("Error pulling all components:"), error.message);
+      process.exit(1);
+    }
+  });
+
 program.parse();
