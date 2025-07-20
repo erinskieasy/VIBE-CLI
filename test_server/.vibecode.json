@@ -1,6 +1,6 @@
 {
-  "platformUrl": "vibe pull button",
-  "projectId": "demo-project",
-  "token": "vibe_sk_1234",
-  "outputFormat": "react-tailwind"
+  "platform": "https://componenthub.io",
+  "projectId": "mytestproject-6k8p05",
+  "accessKey": "vibe_key_EqakZClOGwimmA382s25qayxAJ5XfxC8",
+  "output": "react-tailwind"
 }
