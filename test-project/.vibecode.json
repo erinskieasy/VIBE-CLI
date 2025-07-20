@@ -1,0 +1,6 @@
+{
+  "platformUrl": "https://mock.vibeplatform.dev",
+  "projectId": "demo-project",
+  "token": "vibe_sk_1234",
+  "outputFormat": "react-tailwind"
+}
