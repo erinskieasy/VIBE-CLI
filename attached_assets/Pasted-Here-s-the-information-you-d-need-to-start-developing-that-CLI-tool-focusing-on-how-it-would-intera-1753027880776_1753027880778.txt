@@ -1,0 +1,61 @@
+Here's the information you'd need to start developing that CLI tool, focusing on how it would interact with the Base44 platform's underlying APIs for the entities we've defined:
+
+Understanding the API Interaction for Your CLI Tool
+When deployed on Base44, your entities (Project, Component, ProjectComponentLink, User, Library, Follow, Like) automatically get exposed as RESTful API endpoints. The CLI tool would interact with these.
+
+1. Your Platform URL: First, the platform URL mentioned in your .vibecode.json would be the actual URL of your deployed Base44 application. It won't be componenthub.io. Once your application is live, you'll see its URL (e.g., https://your-app-name.base44.com). This is the base URL for all API calls.
+
+2. Authentication (using accessKey): The accessKey is crucial for authenticating your CLI. For sensitive operations (like push or fetching private project data), the CLI would need to include this accessKey in its requests, likely as a custom HTTP header (e.g., X-Access-Key: your_project_access_key) or as a query parameter. Base44's backend would then validate this key against the Project entity to ensure the CLI is authorized for the given projectId.
+
+3. Core API Endpoints & Operations:
+
+Assuming your Base44 app is deployed at https://your-app-name.base44.com:
+
+Endpoint Structure: Base44 typically exposes entities at /api/v1/entities/<entity_name>.
+Project entity APIs: https://your-app-name.base44.com/api/v1/entities/Project
+Component entity APIs: https://your-app-name.base44.com/api/v1/entities/Component
+ProjectComponentLink entity APIs: https://your-app-name.base44.com/api/v1/entities/ProjectComponentLink
+Here's how a CLI might perform common operations:
+
+*   **`vibe connect` (Initializing a Project Locally):**
+    *   **Action:** The CLI sends the `projectId` and `accessKey` (from the local `.vibecode.json` or provided by the user) to your Base44 app.
+    *   **API Call:**
+        *   **Method:** `GET` or `POST` (depending on how you set up a custom "verification" endpoint, or just directly query the `Project` entity).
+        *   **Endpoint:** `https://your-app-name.base44.com/api/v1/entities/Project?project_id=<your_project_id_from_json>`
+        *   **Headers:** Include `X-Access-Key: <your_access_key_from_json>`.
+    *   **Response:** If successful, the API returns the `Project` entity details, confirming the connection. If not, it returns an error (e.g., 401 Unauthorized, 404 Not Found).
+
+*   **`vibe pull <component_id>` (Importing a Component):**
+    *   **Action:** The CLI needs the `tsx_code` and `props_schema` for a specific component.
+    *   **API Call:**
+        *   **Method:** `GET`
+        *   **Endpoint:** `https://your-app-name.base44.com/api/v1/entities/Component?id=<component_id>`
+        *   **Headers:** Potentially `X-Access-Key` if you want to link the pull operation to a project immediately, or if the component is private.
+    *   **Response:** The `Component` object, including its `tsx_code` and other metadata.
+    *   **Local Action:** CLI writes the `tsx_code` to `src/components/ComponentName.tsx` and creates the `.vibe` file to track its source. It also likely creates or updates a `ProjectComponentLink` entity in your Base44 app (via a `POST` or `PUT` request to `/api/v1/entities/ProjectComponentLink`) to signify this component is now linked to the project.
+
+*   **`vibe push src/components/NewCard.tsx` (Uploading/Updating a Component):**
+    *   **Action:** The CLI reads the local `.tsx` file and its corresponding `.vibe` metadata (if it's an existing component/fork).
+    *   **API Call:**
+        *   **Method:** `POST` (for new components) or `PUT` (for updates).
+        *   **Endpoint:** `https://your-app-name.base44.com/api/v1/entities/Component` (for creating/updating the component itself).
+        *   **Body:** A JSON payload representing the `Component` entity (name, description, tsx_code, etc.).
+        *   **Headers:** Crucially, `X-Access-Key: <your_project_access_key>` to link this action to the project and user.
+    *   **Response:** The newly created/updated `Component` entity with its `id`.
+    *   **Local Action:** If new, update the local `.vibe` file with the component's new platform ID. Also, update the `ProjectComponentLink` entity on Base44 to reflect `status: "modified"` or `synced`.
+
+*   **`vibe sync --update` (Checking for Updates/Syncing Status):**
+    *   **Action:** CLI checks local components against their online versions.
+    *   **API Call:**
+        *   **Method:** `GET`
+        *   **Endpoint:** `https://your-app-name.base44.com/api/v1/entities/ProjectComponentLink?project_id=<your_project_id>`
+        *   **Headers:** `X-Access-Key: <your_project_access_key>`
+    *   **Response:** A list of `ProjectComponentLink` objects for that project, which will contain `component_id` and `version`. The CLI would then fetch the `Component` details for each (via `GET /api/v1/entities/Component?id=...`) to compare versions and determine if the local file is `outdated`.
+4. Local File Management:
+
+.vibecode.json: Your CLI would parse this file to get the platform URL, projectId, and accessKey.
+.vibe files: For each component pulled or pushed, the CLI would create/update a hidden .vibe file alongside the .tsx file. This file would contain crucial metadata like:
+vibe-source: The URL of the component on your platform (e.g., https://your-app-name.base44.com/component/<component_id>).
+vibe-version: The version of the component on the platform.
+vibe-local-hash: A hash of the local tsx file content to quickly detect local modifications without needing to compare the full content.
+This provides a robust framework. The most critical part from the platform side is ensuring that when you deploy your app on Base44, those entity APIs are accessible and behave as expected for your CLI. The accessKey mechanism I've included in the Project entity is the foundation for secure interaction between your CLI and the online registry.
