@@ -83,7 +83,7 @@ program
       
       // Create configuration with provided key and defaults
       const config = {
-        platform: "https://componenthub.io",
+        platform: "https://app--component-hub-01919f93.base44.app",
         projectId: "mytestproject-6k8p05",
         accessKey: options.key,
         output: "react-tailwind"
