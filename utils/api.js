@@ -1,4 +1,3 @@
-
 const chalk = require('chalk');
 const https = require('https');
 const http = require('http');
@@ -8,8 +7,8 @@ const http = require('http');
  */
 module.exports.getComponent = async (name, config) => {
   console.log(chalk.gray(`Requesting component: ${name}`));
-  
-  // First, get all components to find the one with matching name
+
+  // First, get all project component links to find the one with matching name
   const allComponents = await module.exports.listComponents(config);
   const component = allComponents.find(c => 
     c.name === name || 
@@ -17,18 +16,18 @@ module.exports.getComponent = async (name, config) => {
     c.title === name ||
     c.name?.toLowerCase() === name.toLowerCase()
   );
-  
+
   if (!component || !component.id) {
     return null;
   }
-  
-  // Now fetch the specific component using its ID
+
+  // Now fetch the specific component using its ID from ProjectComponentLink
   return await fetchComponentById(config, component.id);
 };
 
 async function fetchComponentById(config, componentId) {
   return new Promise((resolve, reject) => {
-    const url = `${config.platform}/ComponentDetails?id=${componentId}`;
+    const url = `${config.platform}/api/v1/entities/ProjectComponentLink?id=${componentId}`;
     const options = {
       headers: {
         'X-Access-Key': config.accessKey,
@@ -40,17 +39,17 @@ async function fetchComponentById(config, componentId) {
 
     const request = (url.startsWith('https') ? https : http).get(url, options, (res) => {
       let data = '';
-      
+
       res.on('data', (chunk) => {
         data += chunk;
       });
-      
+
       res.on('end', () => {
         try {
           if (res.statusCode === 200) {
             const component = JSON.parse(data);
             console.log(chalk.gray(`Component details:`, JSON.stringify(component, null, 2)));
-            
+
             // Transform Base44 component format to CLI expected format
             resolve({
               name: component.name || component.component_name || component.title,
@@ -81,63 +80,39 @@ async function fetchComponentById(config, componentId) {
 }
 
 /**
- * Real function to list available components from Base44
+ * Real function to list available components from Base44 ProjectComponentLink
  */
 module.exports.listComponents = async (config) => {
-  // Try multiple possible endpoint patterns
-  const endpoints = [
-    `/api/v1/entities/Component`,
-    `/api/entities/Component`,
-    `/entities/Component`,
-    `/api/v1/Component`,
-    `/api/Component`,
-    `/Component`
-  ];
+  console.log(chalk.gray(`Fetching components from: ${config.platform}/api/v1/entities/ProjectComponentLink`));
 
-  for (const endpoint of endpoints) {
-    try {
-      console.log(chalk.gray(`Trying endpoint: ${config.platform}${endpoint}`));
-      const result = await tryEndpoint(config, endpoint);
-      if (result) {
-        return result;
-      }
-    } catch (error) {
-      console.log(chalk.gray(`Failed: ${error.message}`));
-      continue;
-    }
-  }
-  
-  throw new Error('No valid API endpoint found. Please check your platform URL and access key.');
-};
-
-async function tryEndpoint(config, endpoint) {
   return new Promise((resolve, reject) => {
-    const url = `${config.platform}${endpoint}`;
+    const url = `${config.platform}/api/v1/entities/ProjectComponentLink`;
     const options = {
       headers: {
         'X-Access-Key': config.accessKey,
         'Content-Type': 'application/json',
         'User-Agent': 'vibe-cli/0.1.0'
       },
-      rejectUnauthorized: false // Allow self-signed certificates for development
+      rejectUnauthorized: false
     };
 
     const request = (url.startsWith('https') ? https : http).get(url, options, (res) => {
       let data = '';
-      
+
       res.on('data', (chunk) => {
         data += chunk;
       });
-      
+
       res.on('end', () => {
         try {
           if (res.statusCode === 200) {
             const components = JSON.parse(data);
-            console.log(chalk.green(`✅ Found working endpoint: ${url}`));
+            console.log(chalk.green(`✅ Found components from ProjectComponentLink`));
             console.log(chalk.gray(`Response:`, JSON.stringify(components, null, 2)));
-            
+
             // Transform Base44 format to CLI expected format
             const transformedComponents = (Array.isArray(components) ? components : [components])
+              .filter(c => c.project_id === config.projectId) // Filter by project ID
               .map(c => ({
                 id: c.id || c._id || c.component_id,
                 name: c.name || c.component_name || c.title,
@@ -146,7 +121,7 @@ async function tryEndpoint(config, endpoint) {
               }));
             resolve(transformedComponents);
           } else if (res.statusCode === 404) {
-            resolve(null); // Endpoint not found, try next one
+            throw new Error('ProjectComponentLink endpoint not found. Check your platform URL.');
           } else {
             reject(new Error(`HTTP ${res.statusCode}: ${data}`));
           }
@@ -165,14 +140,14 @@ async function tryEndpoint(config, endpoint) {
       reject(new Error('Request timeout'));
     });
   });
-}
+};
 
 /**
  * Verify project connection with Base44 platform
  */
 module.exports.verifyProject = async (config) => {
   return new Promise((resolve, reject) => {
-    const url = `${config.platform}/api/v1/entities/Project`;
+    const url = `${config.platform}/api/v1/entities/Project?id=${config.projectId}`;
     const options = {
       headers: {
         'X-Access-Key': config.accessKey,
@@ -184,11 +159,11 @@ module.exports.verifyProject = async (config) => {
 
     const request = (url.startsWith('https') ? https : http).get(url, options, (res) => {
       let data = '';
-      
+
       res.on('data', (chunk) => {
         data += chunk;
       });
-      
+
       res.on('end', () => {
         try {
           if (res.statusCode === 200) {
