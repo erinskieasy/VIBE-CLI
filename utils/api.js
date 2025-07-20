@@ -9,42 +9,33 @@ const http = require('http');
 module.exports.getComponent = async (name, config) => {
   console.log(chalk.gray(`Requesting component: ${name}`));
   
-  // Try multiple possible endpoint patterns
-  const endpoints = [
-    `/api/v1/entities/Component`,
-    `/api/entities/Component`,
-    `/entities/Component`,
-    `/api/v1/Component`,
-    `/api/Component`,
-    `/Component`
-  ];
-
-  for (const endpoint of endpoints) {
-    try {
-      console.log(chalk.gray(`Trying endpoint: ${config.platform}${endpoint}`));
-      const result = await tryComponentEndpoint(config, endpoint, name);
-      if (result !== null) {
-        return result;
-      }
-    } catch (error) {
-      console.log(chalk.gray(`Failed: ${error.message}`));
-      continue;
-    }
+  // First, get all components to find the one with matching name
+  const allComponents = await module.exports.listComponents(config);
+  const component = allComponents.find(c => 
+    c.name === name || 
+    c.component_name === name || 
+    c.title === name ||
+    c.name?.toLowerCase() === name.toLowerCase()
+  );
+  
+  if (!component || !component.id) {
+    return null;
   }
   
-  throw new Error('No valid API endpoint found. Please check your platform URL and access key.');
+  // Now fetch the specific component using its ID
+  return await fetchComponentById(config, component.id);
 };
 
-async function tryComponentEndpoint(config, endpoint, name) {
+async function fetchComponentById(config, componentId) {
   return new Promise((resolve, reject) => {
-    const url = `${config.platform}${endpoint}`;
+    const url = `${config.platform}/ComponentDetails?id=${componentId}`;
     const options = {
       headers: {
         'X-Access-Key': config.accessKey,
         'Content-Type': 'application/json',
         'User-Agent': 'vibe-cli/0.1.0'
       },
-      rejectUnauthorized: false // Allow self-signed certificates for development
+      rejectUnauthorized: false
     };
 
     const request = (url.startsWith('https') ? https : http).get(url, options, (res) => {
@@ -57,30 +48,18 @@ async function tryComponentEndpoint(config, endpoint, name) {
       res.on('end', () => {
         try {
           if (res.statusCode === 200) {
-            const response = JSON.parse(data);
-            console.log(chalk.gray(`API Response:`, JSON.stringify(response, null, 2)));
+            const component = JSON.parse(data);
+            console.log(chalk.gray(`Component details:`, JSON.stringify(component, null, 2)));
             
-            // Base44 returns arrays, filter by name on client side
-            const components = Array.isArray(response) ? response : [response];
-            const component = components.find(c => 
-              c.name === name || 
-              c.component_name === name || 
-              c.title === name
-            );
-            
-            if (component) {
-              // Transform Base44 component format to CLI expected format
-              resolve({
-                name: component.name || component.component_name || component.title,
-                code: component.tsx_code || component.code || component.content,
-                version: component.version || '1.0.0',
-                description: component.description || component.desc
-              });
-            } else {
-              resolve(null); // Component not found
-            }
+            // Transform Base44 component format to CLI expected format
+            resolve({
+              name: component.name || component.component_name || component.title,
+              code: component.tsx_code || component.code || component.content,
+              version: component.version || '1.0.0',
+              description: component.description || component.desc
+            });
           } else if (res.statusCode === 404) {
-            resolve(null); // Component not found
+            resolve(null);
           } else {
             reject(new Error(`HTTP ${res.statusCode}: ${data}`));
           }
@@ -99,7 +78,7 @@ async function tryComponentEndpoint(config, endpoint, name) {
       reject(new Error('Request timeout'));
     });
   });
-};
+}
 
 /**
  * Real function to list available components from Base44
@@ -160,6 +139,7 @@ async function tryEndpoint(config, endpoint) {
             // Transform Base44 format to CLI expected format
             const transformedComponents = (Array.isArray(components) ? components : [components])
               .map(c => ({
+                id: c.id || c._id || c.component_id,
                 name: c.name || c.component_name || c.title,
                 description: c.description || c.desc,
                 version: c.version || '1.0.0'
