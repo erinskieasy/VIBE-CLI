@@ -1,0 +1,32 @@
+so wait how can i get the real api end points cuz this component hub web app issnt gonna work for me if i can integrate it with my local project
+
+2 minutes ago
+Revert this
+Base44 AI
+Base44
+You're absolutely right to ask for the concrete API endpoints! My apologies if that wasn't clear. The web application I'm building is the "online component library" you want to integrate with.
+
+Here's how it works on the Base44 platform:
+
+Deployment Creates the Endpoints: When this application is finished and "deployed" (which Base44 does automatically as I make changes), Base44 assigns it a unique URL. This URL becomes the base for all its services, including the APIs for the entities we're creating (like Component, Project, User, etc.).
+
+How to Find Your App's URL: Once the app is running in your Base44 workspace, you'll see its unique URL, typically in a format like https://your-app-name.base44.com (the your-app-name part will be unique to your workspace and project). This is the "platform" URL you'd put in your .vibecode.json file.
+
+Constructing the API Endpoints: With your specific app's URL (let's call it YOUR_APP_URL), the API endpoints for the entities will follow a standard pattern:
+
+To interact with Components: YOUR_APP_URL/api/v1/entities/Component
+To interact with Projects: YOUR_APP_URL/api/v1/entities/Project
+To interact with ProjectComponentLinks: YOUR_APP_URL/api/v1/entities/ProjectComponentLink
+To interact with Users: YOUR_APP_URL/api/v1/entities/User
+And so on for any other entity we define (Library, Follow, Like).
+These endpoints support standard RESTful operations:
+
+GET YOUR_APP_URL/api/v1/entities/ComponentName to list all components.
+GET YOUR_APP_URL/api/v1/entities/ComponentName?id=<component_id> to get a specific component by ID.
+POST YOUR_APP_URL/api/v1/entities/ComponentName to create a new component.
+PUT YOUR_APP_URL/api/v1/entities/ComponentName/<component_id> to update a component (though currently, I only focus on creation and don't expose direct PUT for user-created entities from the UI, but the API supports it).
+DELETE YOUR_APP_URL/api/v1/entities/ComponentName/<component_id> to delete a component.
+You can also add query parameters for filtering, for example:
+
+GET YOUR_APP_URL/api/v1/entities/Component?created_by=user@example.com
+In short: The API endpoints are automatically generated and live under your app's unique Base44 URL as soon as the app is deployed. You don't need to do anything special to "activate" them; they are part of the platform's core functionality for every entity we define.
