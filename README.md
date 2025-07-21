@@ -1,5 +1,5 @@
 
-# vibe-cli
+# EsayVibeCli
 
 A Node.js CLI tool that allows developers to connect their local frontend projects to the Component Hub platform and download prebuilt component code snippets.
 
@@ -8,7 +8,7 @@ A Node.js CLI tool that allows developers to connect their local frontend projec
 Install globally via npm:
 
 ```bash
-npm install -g vibe-cli
+npm install -g easyvibecli
 ```
 
 ## Quick Start
