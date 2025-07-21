@@ -176,8 +176,8 @@ program
       
       // Create configuration with provided key and defaults
       const config = {
-        platform: "https://app--component-hub-01919f93.base44.app",
-        projectId: "mytestproject-6k8p05", 
+        platform: "https://app.base44.com",
+        projectId: "687c574f2fee44ff01919f93", 
         accessKey: options.key,
         output: "react-tailwind"
       };
