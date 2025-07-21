@@ -54,6 +54,56 @@ module.exports.listComponents = async (config) => {
 };
 
 /**
+ * Fetch components linked to a specific project from Base44 ProjectComponentLink entities
+ */
+module.exports.listProjectComponents = async (projectId, config) => {
+  return new Promise((resolve, reject) => {
+    const url = `${config.platform}/api/apps/${config.appId}/entities/ProjectComponentLink?project_id=${projectId}`;
+    const options = {
+      headers: {
+        'api_key': config.accessKey,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    console.log(chalk.gray(`Fetching project components from: ${url}`));
+
+    const request = (url.startsWith('https') ? https : http).get(url, options, (res) => {
+      let data = '';
+      
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+      
+      res.on('end', () => {
+        try {
+          if (res.statusCode === 200) {
+            const response = JSON.parse(data);
+            // Base44 returns components in a data array
+            const componentLinks = response.data || response;
+            console.log(chalk.green(`Found ${componentLinks.length} project components`));
+            resolve(componentLinks);
+          } else {
+            reject(new Error(`HTTP ${res.statusCode}: ${data}`));
+          }
+        } catch (error) {
+          reject(new Error(`Failed to parse response: ${error.message}`));
+        }
+      });
+    });
+
+    request.on('error', (error) => {
+      reject(new Error(`Network request failed: ${error.message}`));
+    });
+
+    request.setTimeout(15000, () => {
+      request.destroy();
+      reject(new Error('Request timeout'));
+    });
+  });
+};
+
+/**
  * Get a specific component by ID from Base44
  */
 module.exports.getComponent = async (componentId, config) => {

@@ -68,6 +68,41 @@ program
   });
 
 program
+  .command("pull-project <project-id>")
+  .description("Download all components linked to a specific project")
+  .action(async (projectId) => {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      
+      // Read configuration
+      const configPath = path.join(process.cwd(), '.vibecode.json');
+      if (!fs.existsSync(configPath)) {
+        throw new Error('No .vibecode.json found. Run "vibe init" first.');
+      }
+      
+      const configContent = fs.readFileSync(configPath, 'utf8');
+      const config = JSON.parse(configContent);
+      
+      const { listProjectComponents } = require("../utils/api");
+      const components = await listProjectComponents(projectId, config);
+      
+      console.log(chalk.blue(`🔄 Pulling ${components.length} components for project ${projectId}...`));
+      
+      for (const componentLink of components) {
+        // Extract component ID from the link
+        const componentId = componentLink.component_id;
+        await pull(componentId);
+      }
+      
+      console.log(chalk.green(`✅ Successfully downloaded ${components.length} project components!`));
+    } catch (error) {
+      console.error(chalk.red("Error pulling project components:"), error.message);
+      process.exit(1);
+    }
+  });
+
+program
   .command("connect")
   .description("Quick connect using access key")
   .option("--key <accessKey>", "Access key for authentication")
