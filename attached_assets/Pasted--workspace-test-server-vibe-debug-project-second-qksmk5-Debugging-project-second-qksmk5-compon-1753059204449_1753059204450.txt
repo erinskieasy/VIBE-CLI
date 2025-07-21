@@ -1,0 +1,86 @@
+~/workspace/test_server$ vibe debug-project second-qksmk5
+🔍 Debugging project second-qksmk5 component links...
+Fetching project components from: https://app.base44.com/api/apps/687c574f2fee44ff01919f93/entities/ProjectComponentLink?project_id=second-qksmk5
+Raw API Response: []
+Component links structure: []
+Found 0 project components
+~/workspace/test_server$ vibe debug-project second-qksmk5
+🔍 Debugging project second-qksmk5 component links...
+Attempt 1: Trying query parameter: project_id=second-qksmk5
+Fetching from: https://app.base44.com/api/apps/687c574f2fee44ff01919f93/entities/ProjectComponentLink?project_id=second-qksmk5
+Found 0 results
+Attempt 2: Trying query parameter: projectId=second-qksmk5
+Fetching from: https://app.base44.com/api/apps/687c574f2fee44ff01919f93/entities/ProjectComponentLink?projectId=second-qksmk5
+Found 0 results
+Attempt 3: Trying query parameter: project=second-qksmk5
+Fetching from: https://app.base44.com/api/apps/687c574f2fee44ff01919f93/entities/ProjectComponentLink?project=second-qksmk5
+Found 0 results
+Attempt 4: Trying query parameter: id=second-qksmk5
+Fetching from: https://app.base44.com/api/apps/687c574f2fee44ff01919f93/entities/ProjectComponentLink?id=second-qksmk5
+❌ Failed with query: id=second-qksmk5 - HTTP 500: {"error_type":"ObjectNotFoundError","message":"Invalid id value: second-qksmk5 -> Object not found","detail":"Invalid id value: second-qksmk5 -> Object not found","traceback":""}
+🔍 No results found. Fetching ALL ProjectComponentLinks to analyze structure...
+Fetching ALL ProjectComponentLinks from: https://app.base44.com/api/apps/687c574f2fee44ff01919f93/entities/ProjectComponentLink
+All ProjectComponentLinks structure: [
+  {
+    "project_id": "687d0e8b3e0abad4bb126cb4",
+    "component_id": "687c585c5d22a0995830bc81",
+    "version": "1.0.0",
+    "status": "synced",
+    "id": "687d105135ebf1fd16740ab2",
+    "created_date": "2025-07-20T15:50:41.071000",
+    "updated_date": "2025-07-20T15:50:41.071000",
+    "created_by_id": "687c574f2fee44ff01919f94",
+    "created_by": "xx876xx@gmail.com",
+    "is_sample": false
+  },
+  {
+    "project_id": "687d0e8b3e0abad4bb126cb4",
+    "component_id": "687d82c8169a516a59fc27d0",
+    "version": "1.0.0",
+    "status": "synced",
+    "id": "687d82e3479067277ac48b28",
+    "created_date": "2025-07-20T23:59:31.739000",
+    "updated_date": "2025-07-20T23:59:31.739000",
+    "created_by_id": "687c574f2fee44ff01919f94",
+    "created_by": "xx876xx@gmail.com",
+    "is_sample": false
+  },
+  {
+    "project_id": "687d8d8a169a516a59fc48e5",
+    "component_id": "687c585c5d22a0995830bc84",
+    "version": "1.0.0",
+    "status": "synced",
+    "id": "687d8da0479067277ac4b892",
+    "created_date": "2025-07-21T00:45:20.612000",
+    "updated_date": "2025-07-21T00:45:20.612000",
+    "created_by_id": "687c574f2fee44ff01919f94",
+    "created_by": "xx876xx@gmail.com",
+    "is_sample": false
+  },
+  {
+    "project_id": "687d8d8a169a516a59fc48e5",
+    "component_id": "687c585c5d22a0995830bc83",
+    "version": "1.0.0",
+    "status": "synced",
+    "id": "687d8db1a6718ee42fabd363",
+    "created_date": "2025-07-21T00:45:37.518000",
+    "updated_date": "2025-07-21T00:45:37.518000",
+    "created_by_id": "687c574f2fee44ff01919f94",
+    "created_by": "xx876xx@gmail.com",
+    "is_sample": false
+  },
+  {
+    "project_id": "687d8d8a169a516a59fc48e5",
+    "component_id": "687c585c5d22a0995830bc82",
+    "version": "1.0.0",
+    "status": "synced",
+    "id": "687d8dbdfb9f27c5ba496005",
+    "created_date": "2025-07-21T00:45:49.777000",
+    "updated_date": "2025-07-21T00:45:49.777000",
+    "created_by_id": "687c574f2fee44ff01919f94",
+    "created_by": "xx876xx@gmail.com",
+    "is_sample": false
+  }
+]
+Found 5 total project component links
+~/workspace/test_server$ 
