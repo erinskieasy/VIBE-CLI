@@ -15,8 +15,16 @@
     "react",
     "frontend"
   ],
-  "author": "",
+  "author": "Your Name <your.email@example.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/vibe-cli.git"
+  },
+  "homepage": "https://github.com/yourusername/vibe-cli#readme",
+  "bugs": {
+    "url": "https://github.com/yourusername/vibe-cli/issues"
+  },
   "dependencies": {
     "chalk": "^4.1.2",
     "commander": "^9.5.0",
