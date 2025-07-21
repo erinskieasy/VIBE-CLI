@@ -12,6 +12,8 @@ vibe-cli is a Node.js command-line interface tool designed to connect local fron
 - Updated API configuration to use live Base44 Component Hub endpoints
 - Connected to production API at `https://app.base44.com` with App ID `687c574f2fee44ff01919f93`
 - Successfully tested with real projects and downloaded 4 live components
+- Updated component download path from `src/components/` to `client/src/components/`
+- Bumped version to 0.2.0 to reflect live API integration and path changes
 - Verified all CLI commands work correctly including help, init, pull, debug-project, and connect
 - Established proper workflows for package installation and testing
 - All dependencies installed correctly: chalk, commander, inquirer

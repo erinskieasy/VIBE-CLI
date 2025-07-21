@@ -8,7 +8,7 @@ const pull = require("../lib/pull");
 program
   .name("vibe")
   .description("CLI tool to connect local projects to Component Hub platform")
-  .version("0.1.0");
+  .version("0.2.0");
 
 program
   .command("init")
