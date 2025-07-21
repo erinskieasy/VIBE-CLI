@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe CLI Components Demo</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .component-showcase {
+            border: 2px dashed #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 16px 0;
+            background: #fafafa;
+        }
+        .component-title {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+        .code-header {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Button Component
+        const Button = () => <button className="bg-blue-500 text-white py-2 px-4 rounded">Click Me</button>;
+
+        // Card Component  
+        const Card = ({ title, children }) => (
+            <div className="border rounded p-4 shadow">
+                <h3 className="font-bold text-lg">{title}</h3>
+                <div>{children}</div>
+            </div>
+        );
+
+        // Modal Component
+        const Modal = ({ isOpen, onClose, children }) => {
+            if (!isOpen) return null;
+            
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                        <button 
+                            onClick={onClose}
+                            className="float-right text-gray-500 hover:text-gray-700"
+                        >
+                            ×
+                        </button>
+                        {children}
+                    </div>
+                </div>
+            );
+        };
+
+        // Demo App
+        const App = () => {
+            const [modalOpen, setModalOpen] = React.useState(false);
+
+            return (
+                <div className="min-h-screen bg-gray-50 py-8">
+                    <div className="max-w-4xl mx-auto px-4">
+                        <div className="text-center mb-8">
+                            <h1 className="text-4xl font-bold text-gray-900 mb-2">Vibe CLI Components</h1>
+                            <p className="text-gray-600">Components downloaded from Component Hub platform</p>
+                            <div className="mt-4 text-sm text-gray-500">
+                                <span className="bg-green-100 text-green-800 px-2 py-1 rounded">✓ vibe init</span>
+                                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded ml-2">✓ vibe pull Button</span>
+                                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded ml-2">✓ vibe pull Card</span>
+                                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded ml-2">✓ vibe pull Modal</span>
+                            </div>
+                        </div>
+
+                        {/* Button Component Showcase */}
+                        <div className="component-showcase">
+                            <div className="component-title">Button.tsx</div>
+                            <div className="code-header">// vibe-source: https://mock.vibeplatform.dev/components/Button</div>
+                            <div className="code-header">// version: 1.0.0</div>
+                            <div className="flex gap-4 items-center">
+                                <Button />
+                                <Button />
+                                <span className="text-gray-600">Interactive button component with Tailwind styling</span>
+                            </div>
+                        </div>
+
+                        {/* Card Component Showcase */}
+                        <div className="component-showcase">
+                            <div className="component-title">Card.tsx</div>
+                            <div className="code-header">// vibe-source: https://mock.vibeplatform.dev/components/Card</div>
+                            <div className="code-header">// version: 1.0.0</div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <Card title="Sample Card">
+                                    <p>This is a card component with shadow and border styling.</p>
+                                </Card>
+                                <Card title="Another Card">
+                                    <p>Cards are great for organizing content into distinct sections.</p>
+                                    <Button />
+                                </Card>
+                            </div>
+                        </div>
+
+                        {/* Modal Component Showcase */}
+                        <div className="component-showcase">
+                            <div className="component-title">Modal.tsx</div>
+                            <div className="code-header">// vibe-source: https://mock.vibeplatform.dev/components/Modal</div>
+                            <div className="code-header">// version: 1.0.0</div>
+                            <div className="flex gap-4 items-center">
+                                <button 
+                                    onClick={() => setModalOpen(true)}
+                                    className="bg-purple-500 text-white py-2 px-4 rounded"
+                                >
+                                    Open Modal
+                                </button>
+                                <span className="text-gray-600">Overlay dialog component with backdrop</span>
+                            </div>
+                        </div>
+
+                        {/* File Structure */}
+                        <div className="mt-8 bg-white rounded-lg p-6 shadow">
+                            <h2 className="text-xl font-bold mb-4">Generated File Structure</h2>
+                            <div className="bg-gray-900 text-green-400 p-4 rounded font-mono text-sm">
+                                test-project/<br/>
+                                ├── .vibecode.json<br/>
+                                └── src/<br/>
+                                &nbsp;&nbsp;&nbsp;&nbsp;└── components/<br/>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── Button.tsx<br/>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── Card.tsx<br/>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── Modal.tsx
+                            </div>
+                        </div>
+
+                        {/* Configuration */}
+                        <div className="mt-8 bg-white rounded-lg p-6 shadow">
+                            <h2 className="text-xl font-bold mb-4">Project Configuration</h2>
+                            <div className="bg-gray-900 text-blue-300 p-4 rounded font-mono text-sm">
+                                {JSON.stringify({
+                                    "platformUrl": "https://mock.vibeplatform.dev",
+                                    "projectId": "demo-project", 
+                                    "token": "vibe_sk_1234",
+                                    "outputFormat": "react-tailwind"
+                                }, null, 2)}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Modal Instance */}
+                    <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
+                        <h2 className="text-xl font-bold mb-4">Modal Component Demo</h2>
+                        <p className="mb-4">This modal was generated by vibe-cli and includes:</p>
+                        <ul className="list-disc list-inside mb-4 text-gray-600">
+                            <li>Fixed positioning with backdrop</li>
+                            <li>Center alignment</li>
+                            <li>Close button functionality</li>
+                            <li>Responsive design</li>
+                        </ul>
+                        <Button />
+                    </Modal>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

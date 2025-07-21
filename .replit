@@ -19,6 +19,10 @@ args = "CLI Setup"
 task = "workflow.run"
 args = "test_vibe_cli"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Real Component Showcase"
+
 [[workflows.workflow]]
 name = "CLI Setup"
 author = "agent"
@@ -34,3 +38,25 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm install commander inquirer chalk && chmod +x bin/vibe.js && mkdir -p test-project && cd test-project && node ../bin/vibe.js init"
+
+[[workflows.workflow]]
+name = "Component Preview"
+author = 31452560
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node server.js"
+
+[[workflows.workflow]]
+name = "Real Component Showcase"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node component-showcase.js"
+waitForPort = 5000
+
+[[ports]]
+localPort = 5000
+externalPort = 80
