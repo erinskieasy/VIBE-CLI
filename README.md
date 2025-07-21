@@ -1,5 +1,5 @@
 
-# EsayVibeCli
+# EasyVibeCli
 
 A Node.js CLI tool that allows developers to connect their local frontend projects to the Component Hub platform and download prebuilt component code snippets.
 
