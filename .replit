@@ -34,3 +34,7 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm install commander inquirer chalk && chmod +x bin/vibe.js && mkdir -p test-project && cd test-project && node ../bin/vibe.js init"
+
+[[ports]]
+localPort = 5000
+externalPort = 80
