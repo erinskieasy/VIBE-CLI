@@ -1,6 +1,6 @@
 {
-  "platform": "https://app.base44.com",
-  "appId": "687c574f2fee44ff01919f93",
-  "accessKey": "6c3f465b53514c32add34efa35d7f430",
+  "platform": "https://app--component-hub-01919f93.base44.app",
+  "projectId": "mytestproject-6k8p05",
+  "accessKey": "vibe_key_EqakZClOGwimmA382s25qayxAJ5XfxC8",
   "output": "react-tailwind"
 }
