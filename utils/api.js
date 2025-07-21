@@ -57,37 +57,16 @@ module.exports.listComponents = async (config) => {
  * Fetch components linked to a specific project from Base44 ProjectComponentLink entities
  */
 module.exports.listProjectComponents = async (projectId, config) => {
-  // Try multiple query approaches
-  const queryAttempts = [
-    `project_id=${projectId}`,
-    `projectId=${projectId}`,
-    `project=${projectId}`,
-    `id=${projectId}`
-  ];
-
-  for (let i = 0; i < queryAttempts.length; i++) {
-    const query = queryAttempts[i];
-    console.log(chalk.yellow(`Attempt ${i + 1}: Trying query parameter: ${query}`));
-    
-    try {
-      const result = await tryProjectComponentQuery(query, config);
-      if (result.length > 0) {
-        console.log(chalk.green(`✅ Success with query: ${query}`));
-        return result;
-      }
-    } catch (error) {
-      console.log(chalk.red(`❌ Failed with query: ${query} - ${error.message}`));
-    }
+  // First, get the internal Base44 ID for this project
+  const internalProjectId = await getProjectInternalId(projectId, config);
+  if (!internalProjectId) {
+    throw new Error(`Project "${projectId}" not found`);
   }
 
-  // If no query worked, let's try getting ALL ProjectComponentLinks to see structure
-  console.log(chalk.blue(`🔍 No results found. Fetching ALL ProjectComponentLinks to analyze structure...`));
-  return await getAllProjectComponentLinks(config);
-};
+  console.log(chalk.gray(`Mapped project "${projectId}" to internal ID: ${internalProjectId}`));
 
-async function tryProjectComponentQuery(query, config) {
   return new Promise((resolve, reject) => {
-    const url = `${config.platform}/api/apps/${config.appId}/entities/ProjectComponentLink?${query}`;
+    const url = `${config.platform}/api/apps/${config.appId}/entities/ProjectComponentLink?project_id=${internalProjectId}`;
     const options = {
       headers: {
         'api_key': config.accessKey,
@@ -95,7 +74,7 @@ async function tryProjectComponentQuery(query, config) {
       }
     };
 
-    console.log(chalk.gray(`Fetching from: ${url}`));
+    console.log(chalk.gray(`Fetching project components from: ${url}`));
 
     const request = (url.startsWith('https') ? https : http).get(url, options, (res) => {
       let data = '';
@@ -109,54 +88,7 @@ async function tryProjectComponentQuery(query, config) {
           if (res.statusCode === 200) {
             const response = JSON.parse(data);
             const componentLinks = response.data || response;
-            console.log(chalk.gray(`Found ${componentLinks.length} results`));
-            resolve(componentLinks);
-          } else {
-            reject(new Error(`HTTP ${res.statusCode}: ${data}`));
-          }
-        } catch (error) {
-          reject(new Error(`Failed to parse response: ${error.message}`));
-        }
-      });
-    });
-
-    request.on('error', (error) => {
-      reject(new Error(`Network request failed: ${error.message}`));
-    });
-
-    request.setTimeout(15000, () => {
-      request.destroy();
-      reject(new Error('Request timeout'));
-    });
-  });
-}
-
-async function getAllProjectComponentLinks(config) {
-  return new Promise((resolve, reject) => {
-    const url = `${config.platform}/api/apps/${config.appId}/entities/ProjectComponentLink`;
-    const options = {
-      headers: {
-        'api_key': config.accessKey,
-        'Content-Type': 'application/json'
-      }
-    };
-
-    console.log(chalk.gray(`Fetching ALL ProjectComponentLinks from: ${url}`));
-
-    const request = (url.startsWith('https') ? https : http).get(url, options, (res) => {
-      let data = '';
-      
-      res.on('data', (chunk) => {
-        data += chunk;
-      });
-      
-      res.on('end', () => {
-        try {
-          if (res.statusCode === 200) {
-            const response = JSON.parse(data);
-            const componentLinks = response.data || response;
-            console.log(chalk.yellow(`All ProjectComponentLinks structure:`), JSON.stringify(componentLinks, null, 2));
-            console.log(chalk.green(`Found ${componentLinks.length} total project component links`));
+            console.log(chalk.green(`Found ${componentLinks.length} project components`));
             resolve(componentLinks);
           } else {
             console.log(chalk.red(`API Error - Status: ${res.statusCode}`));
@@ -179,6 +111,61 @@ async function getAllProjectComponentLinks(config) {
     });
   });
 };
+
+/**
+ * Get the internal Base44 ID for a project given its human-readable project_id
+ */
+async function getProjectInternalId(projectId, config) {
+  return new Promise((resolve, reject) => {
+    const url = `${config.platform}/api/apps/${config.appId}/entities/Project`;
+    const options = {
+      headers: {
+        'api_key': config.accessKey,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    const request = (url.startsWith('https') ? https : http).get(url, options, (res) => {
+      let data = '';
+      
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+      
+      res.on('end', () => {
+        try {
+          if (res.statusCode === 200) {
+            const response = JSON.parse(data);
+            const projects = response.data || response;
+            
+            // Find project by project_id
+            const project = projects.find(p => p.project_id === projectId);
+            if (project) {
+              resolve(project.id); // Return internal Base44 ID
+            } else {
+              resolve(null); // Project not found
+            }
+          } else {
+            reject(new Error(`HTTP ${res.statusCode}: ${data}`));
+          }
+        } catch (error) {
+          reject(new Error(`Failed to parse response: ${error.message}`));
+        }
+      });
+    });
+
+    request.on('error', (error) => {
+      reject(new Error(`Network request failed: ${error.message}`));
+    });
+
+    request.setTimeout(15000, () => {
+      request.destroy();
+      reject(new Error('Request timeout'));
+    });
+  });
+}
+
+
 
 /**
  * Get a specific component by ID from Base44
