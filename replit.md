@@ -6,10 +6,13 @@ vibe-cli is a Node.js command-line interface tool designed to connect local fron
 
 ## Recent Changes (July 21, 2025)
 
-✅ **Successful Migration to Replit Environment**
+✅ **Successful Migration to Replit Environment & Live API Integration**
 - Migrated vibe-cli project from Replit Agent to native Replit environment
 - Fixed configuration validation issues (appId vs projectId consistency)
-- Verified all CLI commands work correctly including help, init, pull, and connect
+- Updated API configuration to use live Base44 Component Hub endpoints
+- Connected to production API at `https://app.base44.com` with App ID `687c574f2fee44ff01919f93`
+- Successfully tested with real projects and downloaded 4 live components
+- Verified all CLI commands work correctly including help, init, pull, debug-project, and connect
 - Established proper workflows for package installation and testing
 - All dependencies installed correctly: chalk, commander, inquirer
 - CLI binary properly executable and accessible via npm link
