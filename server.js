@@ -4,9 +4,9 @@ const fs = require('fs');
 const path = require('path');
 
 const server = http.createServer((req, res) => {
-    if (req.url === '/' || req.url === '/preview.html') {
+    if (req.url === '/' || req.url === '/index.html') {
         try {
-            const html = fs.readFileSync(path.join(__dirname, 'preview.html'), 'utf8');
+            const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
             res.writeHead(200, { 'Content-Type': 'text/html' });
             res.end(html);
         } catch (error) {
