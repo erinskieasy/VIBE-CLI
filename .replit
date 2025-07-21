@@ -21,7 +21,7 @@ args = "test_vibe_cli"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Component Showcase"
+args = "Real Component Showcase"
 
 [[workflows.workflow]]
 name = "CLI Setup"
@@ -49,12 +49,12 @@ task = "shell.exec"
 args = "node server.js"
 
 [[workflows.workflow]]
-name = "Component Showcase"
+name = "Real Component Showcase"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd test-project && node server.js"
+args = "node component-showcase.js"
 waitForPort = 5000
 
 [[ports]]
