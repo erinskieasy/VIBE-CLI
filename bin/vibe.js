@@ -103,6 +103,64 @@ program
   });
 
 program
+  .command("debug-project [project-id]")
+  .description("Debug project component links and show available projects")
+  .action(async (projectId) => {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const https = require('https');
+      const http = require('http');
+      
+      // Read configuration
+      const configPath = path.join(process.cwd(), '.vibecode.json');
+      if (!fs.existsSync(configPath)) {
+        throw new Error('No .vibecode.json found. Run "vibe init" first.');
+      }
+      
+      const configContent = fs.readFileSync(configPath, 'utf8');
+      const config = JSON.parse(configContent);
+      
+      if (!projectId) {
+        // Show all projects
+        console.log(chalk.blue('🔍 Fetching all projects...'));
+        const projectsUrl = `${config.platform}/api/apps/${config.appId}/entities/Project`;
+        
+        const projectsRequest = (projectsUrl.startsWith('https') ? https : http).get(projectsUrl, {
+          headers: {
+            'api_key': config.accessKey,
+            'Content-Type': 'application/json'
+          }
+        }, (res) => {
+          let data = '';
+          res.on('data', chunk => data += chunk);
+          res.on('end', () => {
+            try {
+              const projects = JSON.parse(data);
+              console.log(chalk.green('Available Projects:'));
+              console.log(JSON.stringify(projects, null, 2));
+            } catch (e) {
+              console.log(chalk.red('Raw response:'), data);
+            }
+          });
+        });
+        
+        projectsRequest.on('error', (error) => {
+          console.error(chalk.red('Error fetching projects:'), error.message);
+        });
+      } else {
+        // Show specific project component links
+        console.log(chalk.blue(`🔍 Debugging project ${projectId} component links...`));
+        const { listProjectComponents } = require("../utils/api");
+        await listProjectComponents(projectId, config);
+      }
+    } catch (error) {
+      console.error(chalk.red("Debug error:"), error.message);
+      process.exit(1);
+    }
+  });
+
+program
   .command("connect")
   .description("Quick connect using access key")
   .option("--key <accessKey>", "Access key for authentication")

@@ -79,11 +79,16 @@ module.exports.listProjectComponents = async (projectId, config) => {
         try {
           if (res.statusCode === 200) {
             const response = JSON.parse(data);
+            console.log(chalk.yellow(`Raw API Response:`), JSON.stringify(response, null, 2));
+            
             // Base44 returns components in a data array
             const componentLinks = response.data || response;
+            console.log(chalk.blue(`Component links structure:`), JSON.stringify(componentLinks, null, 2));
             console.log(chalk.green(`Found ${componentLinks.length} project components`));
             resolve(componentLinks);
           } else {
+            console.log(chalk.red(`API Error - Status: ${res.statusCode}`));
+            console.log(chalk.red(`Response body:`), data);
             reject(new Error(`HTTP ${res.statusCode}: ${data}`));
           }
         } catch (error) {
