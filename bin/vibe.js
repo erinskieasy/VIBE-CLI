@@ -124,7 +124,7 @@ program
       if (!projectId) {
         // Show all projects
         console.log(chalk.blue('🔍 Fetching all projects...'));
-        const projectsUrl = `${config.platform}/api/apps/${config.appId}/entities/Project`;
+        const projectsUrl = `${config.platform}/api/apps/${config.projectId}/entities/Project`;
         
         const projectsRequest = (projectsUrl.startsWith('https') ? https : http).get(projectsUrl, {
           headers: {
@@ -177,7 +177,7 @@ program
       // Create configuration with provided key and defaults
       const config = {
         platform: "https://app--component-hub-01919f93.base44.app",
-        projectId: "mytestproject-6k8p05",
+        projectId: "mytestproject-6k8p05", 
         accessKey: options.key,
         output: "react-tailwind"
       };

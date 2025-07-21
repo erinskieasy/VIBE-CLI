@@ -8,7 +8,7 @@ const http = require('http');
  */
 module.exports.listComponents = async (config) => {
   return new Promise((resolve, reject) => {
-    const url = `${config.platform}/api/apps/${config.appId}/entities/Component`;
+    const url = `${config.platform}/api/apps/${config.projectId}/entities/Component`;
     const options = {
       headers: {
         'api_key': config.accessKey,
@@ -66,7 +66,7 @@ module.exports.listProjectComponents = async (projectId, config) => {
   console.log(chalk.gray(`Mapped project "${projectId}" to internal ID: ${internalProjectId}`));
 
   return new Promise((resolve, reject) => {
-    const url = `${config.platform}/api/apps/${config.appId}/entities/ProjectComponentLink?project_id=${internalProjectId}`;
+    const url = `${config.platform}/api/apps/${config.projectId}/entities/ProjectComponentLink?project_id=${internalProjectId}`;
     const options = {
       headers: {
         'api_key': config.accessKey,
@@ -117,7 +117,7 @@ module.exports.listProjectComponents = async (projectId, config) => {
  */
 async function getProjectInternalId(projectId, config) {
   return new Promise((resolve, reject) => {
-    const url = `${config.platform}/api/apps/${config.appId}/entities/Project`;
+    const url = `${config.platform}/api/apps/${config.projectId}/entities/Project`;
     const options = {
       headers: {
         'api_key': config.accessKey,
@@ -172,7 +172,7 @@ async function getProjectInternalId(projectId, config) {
  */
 module.exports.getComponent = async (componentId, config) => {
   return new Promise((resolve, reject) => {
-    const url = `${config.platform}/api/apps/${config.appId}/entities/Component/${componentId}`;
+    const url = `${config.platform}/api/apps/${config.projectId}/entities/Component/${componentId}`;
     const options = {
       headers: {
         'api_key': config.accessKey,

@@ -38,3 +38,6 @@ args = "npm install commander inquirer chalk && chmod +x bin/vibe.js && mkdir -p
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[agent]
+expertMode = true
