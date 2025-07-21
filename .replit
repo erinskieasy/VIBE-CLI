@@ -34,3 +34,12 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm install commander inquirer chalk && chmod +x bin/vibe.js && mkdir -p test-project && cd test-project && node ../bin/vibe.js init"
+
+[[workflows.workflow]]
+name = "Component Preview"
+author = 31452560
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node server.js"
